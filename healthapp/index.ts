@@ -24,7 +24,7 @@ app.get('/bmi', (req: express.Request, res: express.Response) => {
         height: height,
         bmi: range,
       });
-  }catch (error) {
+  }catch (_error) {
     res.status(400).json({ 'error': 'malformatted parameters' });
   }
   
@@ -39,12 +39,15 @@ app.post('/exercises', (req, res) => {
   if (!daily || !target) {
     return res.status(400).json({'error':'parameters missing'});
   }
+  else if (Array.isArray(daily) && daily.some(p=>isNaN(Number(p))) || isNaN(Number(target))) {
+      return res.status(400).json({ 'error':'malformatted parameters' });
+  } 
   else if (!daily.some(p=> isNaN(Number(p))) && !isNaN(Number(target))) {
     const result = calculateExercises(daily.map(Number),Number(target));
-    return res.json(result).end;
+    return res.json(result);
   }
   else {
-      return res.status(400).json({'error':'malformatted parameters'});
+      return res.status(400).json({'error':'an error has occurred'});
     }
   
 }); 
